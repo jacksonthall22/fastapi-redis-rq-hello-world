@@ -7,19 +7,17 @@ from rq.job import get_current_job
 
 
 app = FastAPI()
-print(f"Running in: {os.getenv('ENV_MODE', 'unknown')} mode")
-
 redis_conn = Redis(host=os.getenv('REDIS_HOST', 'redis'), port=6379)
 queue = Queue(connection=redis_conn)
 
 @app.post("/new1")
-def create_task_one(task_data: dict):
-    job = queue.enqueue(some_task_one, task_data)
-    return {"job_id": job.id, "test": 123456}
+def create_task_1(task_data: dict):
+    job = queue.enqueue(some_task_1, task_data)
+    return {"job_id": job.id}
 
 @app.post("/new2")
-def create_task_two(task_data: dict):
-    job = queue.enqueue(some_task_two, task_data)
+def create_task_2(task_data: dict):
+    job = queue.enqueue(some_task_2, task_data)
     return {"job_id": job.id}
 
 @app.get("/status/{job_id}")
@@ -41,7 +39,7 @@ def get_job_status(job_id: str):
     
     return status
 
-def some_task_one(data):
+async def some_task_1(data):
     job = get_current_job()
     iters = data.get('iters', 10)
     
@@ -51,7 +49,7 @@ def some_task_one(data):
     
     return {"iters": i, 'job_id': job.id, "reverse": False}
 
-def some_task_two(data):
+def some_task_2(data):
     job = get_current_job()
     iters = data.get('iters', 10)
     
